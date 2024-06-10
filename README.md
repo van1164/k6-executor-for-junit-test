@@ -10,14 +10,14 @@ A Executor for running K6 from Java.
 ### Excutor with JUnit
 
 ```java
-    String[] checkList = {"is status 200", "response time < 500ms"};
-    K6Executor executor = new K6Executor("test.js",checkList);
-    try {
-        boolean success = executor.runTest();
-        assertTrue(success, "K6 load test failed");
-    } catch (Exception e) {
-        fail("Exception occurred during K6 load test: " + e.getMessage());
-    }
+String[] checkList = {"is status 200", "response time < 500ms"};
+K6Executor executor = new K6Executor("test.js",checkList);
+try {
+    boolean success = executor.runTest();
+    assertTrue(success, "K6 load test failed");
+} catch (Exception e) {
+    fail("Exception occurred during K6 load test: " + e.getMessage());
+}
 ```
 
 ### Example k6 script
