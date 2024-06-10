@@ -17,10 +17,29 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 public class K6Executor {
 
-    private String scriptPath;
+    private final String scriptPath;
     private String k6BinaryPath;
 
-    private String[] checkList;
+    private final String[] checkList;
+
+
+    /**
+     *  K6 Executor Constructor
+     *
+     * @param scriptPath : k6 javascript script file path
+     *                   <br> ex) /to/script/path/test.js
+     *
+     * @param checkList :  k6 check list
+     *                  <br> If your script file contains the following,
+     *                  <code>
+     *                  <br>   check(res, {
+     *                  <br>        'is status 200': (r) => r.status === 200,
+     *                  <br>        'response time < 500ms': (r) => r.timings.duration < 50000,
+     *                  <br>        });
+     *                  </code>
+     *                  <br> you can configure the checklist as follows.
+     *                  <br> {@code String[] checkList = {"is status 200", "response time < 500ms"}; }
+     */
 
     public K6Executor(String scriptPath, String[] checkList) {
         this.scriptPath = scriptPath;
@@ -127,6 +146,12 @@ public class K6Executor {
             }
         }
     }
+
+    /**
+     *  K6 Executor Run test & Check for Check List
+     *
+     * @return Returns true if all checklists are satisfied
+     */
 
     public boolean runTest() throws Exception {
 
