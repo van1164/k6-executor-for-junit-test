@@ -34,11 +34,11 @@ public class K6Executor {
      *                  <code>
      *                  <br>   check(res, {
      *                  <br>        'is status 200': (r) => r.status === 200,
-     *                  <br>        'response time < 500ms': (r) => r.timings.duration < 50000,
+     *                  <br>        'response time {@literal <} 500ms': (r) => r.timings.duration {@literal <} 50000,
      *                  <br>        });
      *                  </code>
      *                  <br> you can configure the checklist as follows.
-     *                  <br> {@code String[] checkList = {"is status 200", "response time < 500ms"}; }
+     *                  <br> {@code String[] checkList = {"is status 200", "response time {@literal <} 500ms"}; }
      */
 
     public K6Executor(String scriptPath, String[] checkList) {
@@ -148,7 +148,7 @@ public class K6Executor {
     }
 
     /**
-     *  K6 Executor Run test & Check for Check List
+     *  K6 Executor Run test {@literal &} Check for Check List
      *
      * @return Returns true if all checklists are satisfied
      */
