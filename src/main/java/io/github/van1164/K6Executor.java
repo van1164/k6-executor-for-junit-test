@@ -26,10 +26,10 @@ public class K6Executor {
     /**
      *  K6 Executor Constructor
      *
-     * @param scriptPath : k6 javascript script file path
-     *                   <br> ex) /to/script/path/test.js
-     *
-     * @param checkList :  k6 check list
+     * @param scriptPath k6 javascript script file path
+     *                   <br> ex) "/to/script/path/test.js"
+     *                   <br>
+     * @param checkList  k6 check list
      *                  <br> If your script file contains the following,
      *                  <code>
      *                  <br>   check(res, {
@@ -66,7 +66,7 @@ public class K6Executor {
             throw new Exception("Unsupported OS: " + os);
         }
 
-        // 다운로드
+
         URL url = new URI(k6Url).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -82,7 +82,7 @@ public class K6Executor {
         in.close();
         out.close();
 
-        // 압축 해제 (zip 또는 tar.gz)
+
         if (k6Url.endsWith(".zip")) {
             unzip("k6_download", ".");
         } else {
@@ -113,7 +113,6 @@ public class K6Executor {
             }
         }
 
-        // Windows의 경우 k6.exe를 이동
         if (k6BinaryPath.endsWith(".exe")) {
             File sourceFile = new File(destDir + "/k6-v0.51.0-windows-amd64/k6.exe");
             File destFile = new File(destDir + "/k6.exe");
