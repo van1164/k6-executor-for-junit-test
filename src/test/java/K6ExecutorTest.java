@@ -4,7 +4,6 @@ import io.github.van1164.result.K6Result;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -63,6 +62,19 @@ public class K6ExecutorTest {
             fail("Exception occurred during K6 load test: " + e.getMessage());
         }
         serverStart();
+    }
+
+    @Test
+    public void getRequestCountTest() throws Exception {
+        String[] checkList = {"is status 200", "response time < 500ms"};
+        K6Executor executor = new K6Executor("test.js",checkList);
+        try {
+            K6Result result = executor.runTest();
+            assertTrue(result.httRequestFound());
+            assertEquals(result.getTotalRequest(), result.getSuccessRequest()+result.getFailRequest());
+        } catch (Exception e) {
+            fail("Exception occurred during K6 load test: " + e.getMessage());
+        }
     }
 
 

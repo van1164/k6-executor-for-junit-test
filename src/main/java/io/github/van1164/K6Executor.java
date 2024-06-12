@@ -1,13 +1,17 @@
 package io.github.van1164;
 
 import io.github.van1164.downloader.K6Downloader;
+import io.github.van1164.result.HttpReq;
 import io.github.van1164.result.K6Result;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.github.van1164.util.Constant.K6_BINARY_PATH;
+import static io.github.van1164.util.K6RegexFinder.countHttpReq;
 
 public class K6Executor {
 
@@ -70,20 +74,15 @@ public class K6Executor {
         }
         reader.close();
 
-        String output = outputString.toString();
-        boolean allChecksPass = true;
-        List<String> failedCheckList = new ArrayList<>();
-        allChecksPass = ChecksPassAndCollect(output, allChecksPass,failedCheckList);
-        int exitCode = process.waitFor();
+        String result = outputString.toString();
 
-        if (exitCode != 0) {
-            throw new RuntimeException("K6 RunTime Error: " + exitCode);
-        }
-
-        return new K6Result(exitCode, output, allChecksPass,failedCheckList);
+        return resultToK6Result(result);
     }
 
-    private boolean ChecksPassAndCollect(String result, boolean allChecksPass,List<String> failedCheckList) {
+    private K6Result resultToK6Result(String result) {
+        boolean allChecksPass = true;
+        List<String> failedCheckList = new ArrayList<>();
+        HttpReq httpReq = countHttpReq(result);
         for (String check : checkList) {
             String findArgs = "✓ " + check;
             if (!result.contains(findArgs)) {
@@ -91,7 +90,9 @@ public class K6Executor {
                 failedCheckList.add(check);
             }
         }
-        return allChecksPass;
+        return new K6Result(result, allChecksPass,failedCheckList,httpReq);
     }
+
+
 
 }
