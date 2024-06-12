@@ -39,6 +39,18 @@ public class K6ExecutorTest {
     }
 
     @Test
+    public void isAllPassedListTest() throws Exception {
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
+        K6Executor executor = new K6Executor("test.js",checkList);
+        try {
+            K6Result result =  executor.runTest();
+            assertTrue(result.isAllPassed(), "K6 load test failed");
+        } catch (Exception e) {
+            fail("Exception occurred during K6 load test: " + e.getMessage());
+        }
+    }
+
+    @Test
     public void printResultTest() throws Exception {
         String[] checkList = {"is status 200", "response time < 500ms"};
         K6Executor executor = new K6Executor("test.js",checkList);
