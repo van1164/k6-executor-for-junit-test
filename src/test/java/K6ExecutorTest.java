@@ -1,4 +1,4 @@
-import com.van1164.k6executor.K6Executor;
+import io.github.van1164.K6Executor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
