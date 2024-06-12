@@ -25,3 +25,17 @@ hs_err_pid*
 .gradle/
 
 .idea/
+
+private.pgp
+
+public.pgp
+
+.jreleaser/config.toml
+
+build/*
+
+k6.exe
+
+k6_download
+
+secring.gpg
