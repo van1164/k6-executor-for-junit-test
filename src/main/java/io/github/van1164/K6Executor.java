@@ -12,12 +12,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static io.github.van1164.util.Constant.K6_BINARY_PATH;
 import static io.github.van1164.util.Constant.K6_VERSION;
 import static io.github.van1164.util.K6RegexFinder.countHttpReq;
