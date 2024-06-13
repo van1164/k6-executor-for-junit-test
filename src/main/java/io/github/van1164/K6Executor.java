@@ -1,10 +1,11 @@
 package io.github.van1164;
 
-import io.github.van1164.downloader.K6Downloader;
+import io.github.van1164.downloader.*;
 import io.github.van1164.result.HttpReq;
 import io.github.van1164.result.K6Result;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.github.van1164.util.Constant.K6_BINARY_PATH;
+import static io.github.van1164.util.Constant.K6_VERSION;
 import static io.github.van1164.util.K6RegexFinder.countHttpReq;
 
 public class K6Executor {
@@ -45,11 +47,38 @@ public class K6Executor {
         this.k6BinaryPath = K6_BINARY_PATH;
         this.checkList = checkList;
 
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            this.k6BinaryPath += ".exe";
+        String os = System.getProperty("os.name").toLowerCase();
+        String addedK6Url;
+        String downloadedPath;
+        String fileSeparator = FileSystems.getDefault().getSeparator();
+
+        if (os.contains("win")) {
+            downloadedPath = getDownLoadPath("windows-amd64");
+            addedK6Url = downloadedPath + ".zip";
+            this.k6BinaryPath = downloadedPath+fileSeparator+this.k6BinaryPath + ".exe";
+        } else if (os.contains("mac") || os.contains("darwin")) {
+            String arch = System.getProperty("os.arch").toLowerCase();
+            if(arch.contains("arm") || arch.contains("aarch")){
+                downloadedPath = getDownLoadPath("macos-arm64");
+                addedK6Url = downloadedPath + ".zip";
+                this.k6BinaryPath = downloadedPath+fileSeparator+this.k6BinaryPath;
+            }else if(arch.contains("amd64") || arch.contains("x86_64")){
+                downloadedPath = getDownLoadPath("macos-amd64");
+                addedK6Url = downloadedPath + ".zip";
+                this.k6BinaryPath = downloadedPath+fileSeparator+this.k6BinaryPath;
+            }
+            else {
+                throw new Exception("Unsupported Arch: " + arch);
+            }
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+            downloadedPath = getDownLoadPath("linux-amd64");
+            addedK6Url = downloadedPath + ".tar.gz";
+            this.k6BinaryPath = downloadedPath+fileSeparator+this.k6BinaryPath;
+        } else {
+            throw new Exception("Unsupported OS: " + os);
         }
 
-        K6Downloader k6Downloader = new K6Downloader(this.k6BinaryPath);
+        K6Downloader k6Downloader = new K6Downloader(downloadedPath,addedK6Url);
         if (!new File(k6BinaryPath).exists()) {
             k6Downloader.downloadK6Binary();
         }
@@ -95,6 +124,9 @@ public class K6Executor {
         return new K6Result(result, allChecksPass,failedCheckList,httpReq);
     }
 
+    private String getDownLoadPath(String path){
+        return  "k6-"+ K6_VERSION+"-" + path;
+    }
 
 
 }

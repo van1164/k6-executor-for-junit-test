@@ -6,27 +6,17 @@ import static io.github.van1164.util.Constant.K6_VERSION;
 public class K6Downloader {
 
     private K6DownloaderByOS k6DownloaderByOS;
+    private String k6BinaryPath;
 
-    public K6Downloader(String k6BinaryPath) throws Exception {
+    public K6Downloader(String downloadedPath, String addedK6Url) throws Exception {
         String os = System.getProperty("os.name").toLowerCase();
-        String k6Url = String.format("https://github.com/grafana/k6/releases/download/%1$s/k6-%1$s-",K6_VERSION);
+        String k6Url = String.format("https://github.com/grafana/k6/releases/download/%s/%s",K6_VERSION,addedK6Url);
         if (os.contains("win")) {
-            k6Url += "windows-amd64.zip";
-            k6DownloaderByOS = new WindowsDownloader(k6Url,k6BinaryPath);
+            k6DownloaderByOS = new WindowsDownloader(k6Url,downloadedPath);
         } else if (os.contains("mac") || os.contains("darwin")) {
-            String arch = System.getProperty("os.arch").toLowerCase();
-            if(arch.contains("arm") || arch.contains("aarch")){
-                k6Url += "macos-arm64.zip";
-            }else if(arch.contains("amd64") || arch.contains("x86_64")){
-                k6Url += "macos-amd64.zip";
-            }
-            else {
-                throw new Exception("Unsupported Arch: " + arch);
-            }
-            k6DownloaderByOS = new MacDownloader(k6Url,k6BinaryPath);
+            k6DownloaderByOS = new MacDownloader(k6Url,downloadedPath);
         } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
-            k6Url += "linux-amd64.tar.gz";
-            k6DownloaderByOS = new LinuxDownloader(k6Url,k6BinaryPath);
+            k6DownloaderByOS = new LinuxDownloader(k6Url,downloadedPath);
         } else {
             throw new Exception("Unsupported OS: " + os);
         }
@@ -35,4 +25,5 @@ public class K6Downloader {
     public void downloadK6Binary() throws Exception {
         k6DownloaderByOS.k6DownloadAndExtract();
     }
+
 }

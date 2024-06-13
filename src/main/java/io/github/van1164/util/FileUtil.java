@@ -36,15 +36,6 @@ public class FileUtil {
             }
         }
         deleteFile(filePath);
-
-        if (k6BinaryPath.endsWith(".exe")) {
-            File sourceFile = new File(destDir + String.format("/k6-%s-windows-amd64/k6.exe",K6_VERSION));
-            File destFile = new File(destDir + "/k6.exe");
-            if (!destFile.exists() && sourceFile.exists()) {
-                Files.move(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-            deleteDir(String.format(destDir +"/k6-%s-windows-amd64",K6_VERSION));
-        }
     }
 
     public static void untar(String filePath, String destDir, String k6BinaryPath) throws Exception {
