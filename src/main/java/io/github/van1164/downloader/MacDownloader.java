@@ -1,6 +1,7 @@
 package io.github.van1164.downloader;
 
 import static io.github.van1164.util.Constant.TAR_FILE_NAME;
+import static io.github.van1164.util.Constant.ZIP_FILE_NAME;
 import static io.github.van1164.util.FileUtil.unzip;
 
 public class MacDownloader extends AbstractK6DownloaderByOS {
@@ -12,8 +13,8 @@ public class MacDownloader extends AbstractK6DownloaderByOS {
 
     @Override
     public void k6DownloadAndExtract() throws Exception {
-        downloadFile(k6Url,TAR_FILE_NAME);
-        unzip(TAR_FILE_NAME, ".",k6BinaryPath);
+        downloadFile(k6Url,ZIP_FILE_NAME);
+        unzip(ZIP_FILE_NAME, ".",k6BinaryPath);
     }
 
 
