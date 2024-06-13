@@ -82,7 +82,7 @@ public class K6ExecutorTest {
         K6Executor executor = new K6Executor("test.js",checkList);
         try {
             K6Result result = executor.runTest();
-            assertTrue(result.httRequestFound());
+            assertTrue(result.httpRequestFound());
             assertEquals(result.getTotalRequest(), result.getSuccessRequest()+result.getFailRequest());
         } catch (Exception e) {
             fail("Exception occurred during K6 load test: " + e.getMessage());
