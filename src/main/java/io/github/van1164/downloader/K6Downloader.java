@@ -14,11 +14,14 @@ public class K6Downloader {
             k6Url += "windows-amd64.zip";
             k6DownloaderByOS = new WindowsDownloader(k6Url,k6BinaryPath);
         } else if (os.contains("mac") || os.contains("darwin")) {
-            String arch = System.getProperty("os.arch");
-            if(arch.contains("arm")){
-                k6Url += "macos-amd64.zip";
+            String arch = System.getProperty("os.arch").toLowerCase();
+            if(arch.contains("arm") || arch.contains("aarch")){
+                k6Url += "macos-arm64.zip";
             }else if(arch.contains("amd64") || arch.contains("x86_64")){
                 k6Url += "macos-amd64.zip";
+            }
+            else {
+                throw new Exception("Unsupported Arch: " + arch);
             }
             k6DownloaderByOS = new MacDownloader(k6Url,k6BinaryPath);
         } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
