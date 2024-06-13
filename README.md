@@ -19,7 +19,8 @@ implementation("io.github.van1164:k6-executor:0.4.1")
 ## run test
 ```java
 List<String> checkList = List.of("is status 200", "response time < 500ms");
-K6Executor executor = new K6Executor("test.js",checkList);
+K6Executor executor = new K6Executor("test.js",checkList);  // If you specify "test.js", it is the root path of gradle
+//K6Executor executor = new K6Executor("C:\\Users\\test.js",checkList);  It also supports absolute paths.
 K6Result result = executor.runTest();
 ```
 
