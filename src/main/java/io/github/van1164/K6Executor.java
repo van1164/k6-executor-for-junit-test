@@ -6,9 +6,15 @@ import io.github.van1164.result.K6Result;
 
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,6 +87,7 @@ public class K6Executor {
         K6Downloader k6Downloader = new K6Downloader(downloadedPath,addedK6Url);
         if (!new File(k6BinaryPath).exists()) {
             k6Downloader.downloadK6Binary();
+            givePermission();
         }
     }
 
@@ -108,6 +115,20 @@ public class K6Executor {
         String result = outputString.toString();
 
         return resultToK6Result(result);
+    }
+
+    private void givePermission() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("mac") || os.contains("darwin") || os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+            try {
+                Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-xr-x");
+                Path k6Path = Paths.get(k6BinaryPath);
+                Files.setPosixFilePermissions(k6Path, permissions);
+                System.out.println("Permissions set successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private K6Result resultToK6Result(String result) {
