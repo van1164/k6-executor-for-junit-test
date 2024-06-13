@@ -1,15 +1,90 @@
 # K6-Executor-For-Junit-Test
 
-A Executor for running K6 from Java.
+> A Executor that can run K6 only with java code even if K6 is not installed local
+> 
+<br>
+
+> 로컬에 K6가 설치되어 있지 않아도 java 코드로만 K6를 실행할 수 있는 Executor
 
 ## Install
 gradle
 ```groovy
-implementation 'io.github.van1164:k6-executor:0.3.2'
+implementation 'io.github.van1164:k6-executor:0.4.1'
 ```
 gradle.kts
 ```kotlin
-implementation("io.github.van1164:k6-executor:0.3.2")
+implementation("io.github.van1164:k6-executor:0.4.1")
+```
+
+## run test
+```java
+List<String> checkList = List.of("is status 200", "response time < 500ms");
+K6Executor executor = new K6Executor("test.js",checkList);
+K6Result result = executor.runTest();
+```
+
+## printResult
+code
+```java
+result.printResult();
+```
+
+result
+
+```
+
+          /\      |‾‾| /‾‾/   /‾‾/   
+     /\  /  \     |  |/  /   /  /    
+    /  \/    \    |     (   /   ‾‾\  
+   /          \   |  |\  \ |  (‾)  | 
+  / __________ \  |__| \__\ \_____/ .io
+
+time="2024-06-13T17:54:16+09:00" level=warning msg="the `vus=10` option will be ignored, it only works in conjunction with `iterations`, `duration`, or `stages`"
+     execution: local
+        script: test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+              * default: 1 iterations for each of 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+
+
+running (00m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m01.0s/10m0s  0/1 iters, 1 per VU
+
+     ✓ is status 200
+     ✓ response time < 500ms
+
+     checks.........................: 100.00% ✓ 2       ✗ 0  
+     data_received..................: 89 B    87 B/s
+     data_sent......................: 80 B    78 B/s
+     http_req_blocked...............: avg=13.15ms min=13.15ms med=13.15ms max=13.15ms p(90)=13.15ms p(95)=13.15ms
+     http_req_connecting............: avg=509.6µs min=509.6µs med=509.6µs max=509.6µs p(90)=509.6µs p(95)=509.6µs
+     http_req_duration..............: avg=574.1µs min=574.1µs med=574.1µs max=574.1µs p(90)=574.1µs p(95)=574.1µs
+       { expected_response:true }...: avg=574.1µs min=574.1µs med=574.1µs max=574.1µs p(90)=574.1µs p(95)=574.1µs
+     http_req_failed................: 0.00%   ✓ 0       ✗ 1  
+     http_req_receiving.............: avg=0s      min=0s      med=0s      max=0s      p(90)=0s      p(95)=0s     
+     http_req_sending...............: avg=63.3µs  min=63.3µs  med=63.3µs  max=63.3µs  p(90)=63.3µs  p(95)=63.3µs 
+     http_req_tls_handshaking.......: avg=0s      min=0s      med=0s      max=0s      p(90)=0s      p(95)=0s     
+     http_req_waiting...............: avg=510.8µs min=510.8µs med=510.8µs max=510.8µs p(90)=510.8µs p(95)=510.8µs
+     http_reqs......................: 1       0.97802/s
+     iteration_duration.............: avg=1.02s   min=1.02s   med=1.02s   max=1.02s   p(90)=1.02s   p(95)=1.02s  
+     iterations.....................: 1       0.97802/s
+     vus............................: 1       min=1     max=1
+     vus_max........................: 1       min=1     max=1
+
+
+running (00m01.0s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  00m01.0s/10m0s  1/1 iters, 1 per VU
+
+```
+
+---
+
+## HTTP Total Request
+```java
+result.getTotalRequest()	// total request : Integer
+result.getSuccessRequest()	// success request : Integer
+result.getFailRequest()		// fail request : Integer
 ```
 
 ## Example With Spring
@@ -37,7 +112,6 @@ class AppApplicationTests {
         try {
             K6Result result = executor.runTest();
             assertTrue(result.isAllPassed());
-            result.printResult();
             Trip trip = tripRepository.findById(tripId).get();
             assertEquals(result.getSuccessRequest(),trip.getLikeCount());  // successRequest vs trip.getLikeCount
         } catch (Exception e) {
@@ -108,11 +182,6 @@ import { check, sleep } from 'k6';
 
 export let options = {
   vus: 2,
-  stages: [
-    { duration: '1s', target: 100 },
-    { duration: '2s', target: 100 },
-    { duration: '1s', target: 0 },
-  ],
 };
 
 export default function () {
@@ -123,7 +192,6 @@ export default function () {
     'is status 200': (r) => r.status === 200, 
     'response time < 500ms': (r) => r.timings.duration < 50000, 
   });
-
   sleep(1); 
 }
 ```
