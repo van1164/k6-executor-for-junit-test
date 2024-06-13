@@ -5,10 +5,11 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static io.github.van1164.util.Constant.K6_VERSION;
 
 public class FileUtil {
 
@@ -34,17 +35,19 @@ public class FileUtil {
                 zipIn.closeEntry();
             }
         }
+        deleteFile(filePath);
 
         if (k6BinaryPath.endsWith(".exe")) {
-            File sourceFile = new File(destDir + "/k6-v0.51.0-windows-amd64/k6.exe");
+            File sourceFile = new File(destDir + String.format("/k6-%s-windows-amd64/k6.exe",K6_VERSION));
             File destFile = new File(destDir + "/k6.exe");
             if (!destFile.exists() && sourceFile.exists()) {
                 Files.move(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
+            deleteDir(String.format(destDir +"/k6-%s-windows-amd64",K6_VERSION));
         }
     }
 
-    private static void untar(String filePath, String destDir) throws Exception {
+    public static void untar(String filePath, String destDir, String k6BinaryPath) throws Exception {
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(
                 new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(filePath))))) {
             TarArchiveEntry entry;
@@ -65,6 +68,29 @@ public class FileUtil {
                     }
                 }
             }
+        }
+        deleteFile(filePath);
+    }
+
+    private static void deleteFile(String filePath) {
+        Path path = Paths.get(filePath);
+        try {
+            Files.delete(path);
+        } catch (NoSuchFileException e) {
+            System.err.println("k6 file not found: " + filePath);
+        } catch (Exception e) {
+            System.err.println("k6 directory already exist: " + filePath);
+        }
+    }
+
+    private static void deleteDir(String dirPath){
+        Path path = Paths.get(dirPath);
+        try {
+            Files.delete(path);
+        } catch (NoSuchFileException e) {
+            System.err.println("k6 file not found: " + dirPath);
+        } catch (Exception e) {
+            System.err.println("k6 directory already exist: " + dirPath);
         }
     }
 }

@@ -21,38 +21,6 @@ public class K6Executor {
     private final List<String> checkList;
 
 
-    /**
-     * K6 Executor Constructor
-     *
-     * @param scriptPath k6 javascript script file path
-     *                   <br> ex) "/to/script/path/test.js"
-     *                   <br>
-     * @param checkList  k6 check list
-     *                   <br> If your script file contains the following,
-     *                   <code>
-     *                   <br>   check(res, {
-     *                   <br>        'is status 200': (r) => r.status === 200,
-     *                   <br>        'response time {@literal <} 500ms': (r) => r.timings.duration {@literal <} 50000,
-     *                   <br>        });
-     *                   </code>
-     *                   <br> you can configure the checklist as follows.
-     *                   <br> {@code String[] checkList = {"is status 200", "response time {@literal <} 500ms"}; }
-     */
-
-    public K6Executor(String scriptPath, String[] checkList) throws Exception {
-        this.scriptPath = scriptPath;
-        this.k6BinaryPath = K6_BINARY_PATH;
-        this.checkList = Arrays.stream(checkList).toList();
-
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            this.k6BinaryPath += ".exe";
-        }
-
-        K6Downloader k6Downloader = new K6Downloader(this.k6BinaryPath);
-        if (!new File(k6BinaryPath).exists()) {
-            k6Downloader.downloadK6Binary();
-        }
-    }
 
     /**
      * K6 Executor Constructor

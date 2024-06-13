@@ -28,7 +28,7 @@ public class K6ExecutorTest {
 
     @Test
     public void isAllPassedTest() throws Exception {
-        String[] checkList = {"is status 200", "response time < 500ms"};
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
         K6Executor executor = new K6Executor("test.js",checkList);
         try {
             K6Result result =  executor.runTest();
@@ -52,7 +52,7 @@ public class K6ExecutorTest {
 
     @Test
     public void printResultTest() throws Exception {
-        String[] checkList = {"is status 200", "response time < 500ms"};
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
         K6Executor executor = new K6Executor("test.js",checkList);
         try {
             K6Result result = executor.runTest();
@@ -65,7 +65,7 @@ public class K6ExecutorTest {
     @Test
     public void getFailedCheckListTest() throws Exception {
         server.stop(0);
-        String[] checkList = {"is status 200", "response time < 500ms"};
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
         K6Executor executor = new K6Executor("test.js",checkList);
         try {
             K6Result result = executor.runTest();
@@ -78,7 +78,7 @@ public class K6ExecutorTest {
 
     @Test
     public void getRequestCountTest() throws Exception {
-        String[] checkList = {"is status 200", "response time < 500ms"};
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
         K6Executor executor = new K6Executor("test.js",checkList);
         try {
             K6Result result = executor.runTest();
@@ -88,7 +88,6 @@ public class K6ExecutorTest {
             fail("Exception occurred during K6 load test: " + e.getMessage());
         }
     }
-
 
 
     private static void serverStart() throws IOException {
