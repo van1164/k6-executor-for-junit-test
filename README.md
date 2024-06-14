@@ -96,17 +96,14 @@ result.getFailRequest()		// fail request : Integer
 
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class AppApplicationTests {
-
-   //
+class K6Tests {
 
     @BeforeEach
     public void before() {
-//
     }
 
     @Test
-    void contextLoads() throws Exception {
+    void k6ExecutorTest() throws Exception {
         System.out.print(tripId);
         List<String> checkList = List.of("is status 200", "response time < 500ms");
         K6Executor executor = new K6Executor("test.js", checkList);
