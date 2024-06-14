@@ -1,20 +1,81 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'java'
+    id "com.vanniktech.maven.publish" version "0.28.0"
+    id 'signing'
 }
 
-group = 'com.van1164'
-version = '1.0-SNAPSHOT'
+group = 'io.github.van1164'
+version = '0.4.1'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 repositories {
     mavenCentral()
 }
+compileJava.options.encoding='UTF-8'
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc) {
+    options {
+        encoding 'UTF-8'
+    }
+}
+signing {
+    sign publishing.publications
+}
+
+mavenPublishing {
+    signAllPublications()
+//    configure(new JavaLibrary(new JavadocJar.Empty(), true))
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+//    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
+
+
+    coordinates("io.github.van1164", "k6-executor", "0.4.1")
+
+    pom {
+        name = "k6-executor"
+        description = "k6-executor for junit"
+        inceptionYear = "2024"
+        url = "https://github.com/van1164/k6-executor-for-junit-test"
+
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = "van1164"
+                name = "Sihwan Kim"
+                url = "https://github.com/van1164"
+            }
+        }
+        scm {
+            url = "https://github.com/van1164/k6-executor-for-junit-test"
+            connection = "scm:git:git://github.com/van1164/k6-executor-for-junit-test.git"
+            developerConnection = "scm:git:ssh://git@github.com/van1164"
+        }
+    }
+}
+
+
+
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation 'org.apache.commons:commons-compress:1.21'
+    implementation 'org.apache.commons:commons-compress:1.26.2'
 }
 
 test {
     useJUnitPlatform()
 }
+
