@@ -9,11 +9,11 @@
 ## Install
 gradle
 ```groovy
-implementation 'io.github.van1164:k6-executor:0.4.1'
+implementation 'io.github.van1164:k6-executor:0.5.0'
 ```
 gradle.kts
 ```kotlin
-implementation("io.github.van1164:k6-executor:0.4.1")
+implementation("io.github.van1164:k6-executor:0.5.0")
 ```
 
 ## run test
