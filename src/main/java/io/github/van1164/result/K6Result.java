@@ -1,5 +1,6 @@
 package io.github.van1164.result;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class K6Result {
@@ -8,15 +9,17 @@ public class K6Result {
     private Boolean allChecksPass = false;
     private List<String> failedCheckList;
     private HttpReq httpReq;
+    private HashMap<String,Integer> countHashMap;
 
     public K6Result() {
     }
 
-    public K6Result( String resultBody, Boolean allChecksPass, List<String> failedCheckList, HttpReq httpReq) {
+    public K6Result(String resultBody, Boolean allChecksPass, List<String> failedCheckList, HttpReq httpReq, HashMap<String,Integer> countHashMap) {
         this.resultBody = resultBody;
         this.allChecksPass = allChecksPass;
         this.failedCheckList = failedCheckList;
         this.httpReq = httpReq;
+        this.countHashMap = countHashMap;
     }
 
 
@@ -79,6 +82,10 @@ public class K6Result {
      */
     public Boolean httpRequestFound() {
         return httpReq.found;
+    }
+
+    public Integer getCount(String countName){
+        return this.countHashMap.get(countName);
     }
 
 }

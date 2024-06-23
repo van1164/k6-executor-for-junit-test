@@ -25,4 +25,21 @@ public class K6RegexFinder {
             return new HttpReq();
         }
     }
+
+    public static Integer countByResult(String result,String countName){
+        try {
+            String regex = countName +".+:\\s+(\\d+)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(result);
+            if(matcher.find() && matcher.groupCount() ==1){
+                return Integer.valueOf(matcher.group(1));
+            }
+            else{
+                return null;
+            }
+        }
+        catch (Exception e){
+            return null;
+        }
+    }
 }

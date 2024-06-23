@@ -27,9 +27,9 @@ public class K6ExecutorTest {
     }
 
     @Test
-    public void isAllPassedTest() throws Exception {
+    public void isAllPassedTest() {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js",checkList);
+        K6Executor executor = K6Executor.builder().scriptPath("test.js").checkList(checkList).build();
         try {
             K6Result result =  executor.runTest();
             assertTrue(result.isAllPassed(), "K6 load test failed");
@@ -39,9 +39,9 @@ public class K6ExecutorTest {
     }
 
     @Test
-    public void isAllPassedListTest() throws Exception {
+    public void isAllPassedListTest() {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js",checkList);
+        K6Executor executor = K6Executor.builder().scriptPath("test.js").checkList(checkList).build();
         try {
             K6Result result =  executor.runTest();
             assertTrue(result.isAllPassed(), "K6 load test failed");
@@ -51,9 +51,9 @@ public class K6ExecutorTest {
     }
 
     @Test
-    public void printResultTest() throws Exception {
+    public void printResultTest() {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js",checkList);
+        K6Executor executor = K6Executor.builder().scriptPath("test.js").checkList(checkList).build();
         try {
             K6Result result = executor.runTest();
             result.printResult();
@@ -66,7 +66,7 @@ public class K6ExecutorTest {
     public void getFailedCheckListTest() throws Exception {
         server.stop(0);
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js",checkList);
+        K6Executor executor = K6Executor.builder().scriptPath("test.js").checkList(checkList).build();
         try {
             K6Result result = executor.runTest();
             assertEquals(result.getFailedCheckList(), List.of("is status 200"));
@@ -77,9 +77,9 @@ public class K6ExecutorTest {
     }
 
     @Test
-    public void getRequestCountTest() throws Exception {
+    public void getRequestCountTest() {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js",checkList);
+        K6Executor executor = K6Executor.builder().scriptPath("test.js").checkList(checkList).build();
         try {
             K6Result result = executor.runTest();
             assertTrue(result.httpRequestFound());
@@ -89,6 +89,25 @@ public class K6ExecutorTest {
         }
     }
 
+    @Test
+    public void getCounterTest() {
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
+        List<String> counterList = List.of("success_check");
+        K6Executor executor = K6Executor.builder()
+                .scriptPath("counter_test.js")
+                .checkList(checkList)
+                .counterList(counterList)
+                .build();
+        try {
+            K6Result result = executor.runTest();
+            assertTrue(result.httpRequestFound());
+            assertEquals(result.getTotalRequest(), result.getSuccessRequest()+result.getFailRequest());
+            result.printResult();
+            assertEquals(result.getCount("success_check"),result.getSuccessRequest());
+        } catch (Exception e) {
+            fail("Exception occurred during K6 load test: " + e.getMessage());
+        }
+    }
 
     private static void serverStart() throws IOException {
         server = HttpServer.create(new InetSocketAddress(8080), 0);
