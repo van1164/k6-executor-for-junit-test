@@ -9,17 +9,22 @@
 ## Install
 gradle
 ```groovy
-implementation 'io.github.van1164:k6-executor:0.4.1'
+implementation 'io.github.van1164:k6-executor:0.5.1'
 ```
 gradle.kts
 ```kotlin
-implementation("io.github.van1164:k6-executor:0.4.1")
+implementation("io.github.van1164:k6-executor:0.5.1")
 ```
 
 ## run test
 ```java
 List<String> checkList = List.of("is status 200", "response time < 500ms");
-K6Executor executor = new K6Executor("test.js",checkList);  // If you specify "test.js", it is the root path of gradle
+List<String> counterList = List.of("success_check");
+K6Executor executor = K6Executor.builder()
+	.scriptPath("test.js")  // If you specify "test.js", it is the root path of gradle
+	.checkList(checkList)
+	.counterList(counterList)
+	.build();
 //K6Executor executor = new K6Executor("C:\\Users\\test.js",checkList);  It also supports absolute paths.
 K6Result result = executor.runTest();
 ```
