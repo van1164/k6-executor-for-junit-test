@@ -10,9 +10,9 @@ public class LinuxDownloader extends AbstractK6DownloaderByOS{
     }
 
     @Override
-    public void k6DownloadAndExtract() throws Exception {
+    public void k6DownloadAndExtract(){
         downloadFile(k6Url,TAR_FILE_NAME);
-        untar(TAR_FILE_NAME, ".",k6BinaryPath);
+        untar(TAR_FILE_NAME, ".");
     }
 
 }

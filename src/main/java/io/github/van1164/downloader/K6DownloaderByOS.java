@@ -2,6 +2,6 @@ package io.github.van1164.downloader;
 
 public interface K6DownloaderByOS {
 
-    void k6DownloadAndExtract() throws Exception;
+    void k6DownloadAndExtract();
 
 }

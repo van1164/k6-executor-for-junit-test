@@ -13,7 +13,7 @@ import static io.github.van1164.util.Constant.K6_VERSION;
 
 public class FileUtil {
 
-    public static void unzip(String filePath, String destDir, String k6BinaryPath) throws Exception {
+    public static void unzip(String filePath, String destDir) {
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(filePath))) {
             ZipEntry entry;
             while ((entry = zipIn.getNextEntry()) != null) {
@@ -34,11 +34,13 @@ public class FileUtil {
                 }
                 zipIn.closeEntry();
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to unzip file: " + filePath, e);
         }
         deleteFile(filePath);
     }
 
-    public static void untar(String filePath, String destDir, String k6BinaryPath) throws Exception {
+    public static void untar(String filePath, String destDir) {
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(
                 new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(filePath))))) {
             TarArchiveEntry entry;
@@ -59,6 +61,8 @@ public class FileUtil {
                     }
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to untar file: " + filePath, e);
         }
         deleteFile(filePath);
     }
@@ -68,9 +72,9 @@ public class FileUtil {
         try {
             Files.delete(path);
         } catch (NoSuchFileException e) {
-            System.err.println("k6 file not found: " + filePath);
+            throw new RuntimeException("k6 file not found: " + filePath);
         } catch (Exception e) {
-            System.err.println("k6 directory already exist: " + filePath);
+            throw new RuntimeException("k6 directory already exist: " + filePath);
         }
     }
 
@@ -79,9 +83,9 @@ public class FileUtil {
         try {
             Files.delete(path);
         } catch (NoSuchFileException e) {
-            System.err.println("k6 file not found: " + dirPath);
+            throw new RuntimeException("k6 file not found: " + dirPath);
         } catch (Exception e) {
-            System.err.println("k6 directory already exist: " + dirPath);
+            throw new RuntimeException("k6 directory already exist: " + dirPath);
         }
     }
 }

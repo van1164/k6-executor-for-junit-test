@@ -12,9 +12,9 @@ public class MacDownloader extends AbstractK6DownloaderByOS {
     }
 
     @Override
-    public void k6DownloadAndExtract() throws Exception {
+    public void k6DownloadAndExtract() {
         downloadFile(k6Url,ZIP_FILE_NAME);
-        unzip(ZIP_FILE_NAME, ".",k6BinaryPath);
+        unzip(ZIP_FILE_NAME, ".");
     }
 
 

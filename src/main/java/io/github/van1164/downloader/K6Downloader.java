@@ -8,7 +8,7 @@ public class K6Downloader {
     private K6DownloaderByOS k6DownloaderByOS;
     private String k6BinaryPath;
 
-    public K6Downloader(String downloadedPath, String addedK6Url) throws Exception {
+    public K6Downloader(String downloadedPath, String addedK6Url) {
         String os = System.getProperty("os.name").toLowerCase();
         String k6Url = String.format("https://github.com/grafana/k6/releases/download/%s/%s",K6_VERSION,addedK6Url);
         if (os.contains("win")) {
@@ -18,11 +18,11 @@ public class K6Downloader {
         } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
             k6DownloaderByOS = new LinuxDownloader(k6Url,downloadedPath);
         } else {
-            throw new Exception("Unsupported OS: " + os);
+            throw new RuntimeException("Unsupported OS: " + os);
         }
     }
 
-    public void downloadK6Binary() throws Exception {
+    public void downloadK6Binary(){
         k6DownloaderByOS.k6DownloadAndExtract();
     }
 
