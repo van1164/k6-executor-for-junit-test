@@ -27,23 +27,17 @@ import static io.github.van1164.util.K6RegexFinder.countHttpReq;
 @Builder
 public class K6Executor {
 
-    private final String scriptPath;
+    private String scriptPath;
+
+    @Builder.Default
     private String k6BinaryPath = K6_BINARY_PATH;
-    private List<String> checkList;
-    private List<String> counterList;
 
-    public static class K6ExecutorBuilder {
-        public K6Executor build() {
-            if (checkList == null){
-                checkList = List.of();
-            }
+    @Builder.Default
+    private List<String> checkList = List.of();
 
-            if (counterList == null){
-                counterList = List.of();
-            }
-                return new K6Executor(scriptPath, checkList, counterList);
-        }
-    }
+    @Builder.Default
+    private List<String> counterList = List.of();
+    
 
     /**
      * K6 Executor Constructor
@@ -63,13 +57,14 @@ public class K6Executor {
      *                   <br> {@code List<String> checkList = {"is status 200", "response time {@literal <} 500ms"}; }
      */
 
-    public K6Executor(String scriptPath, List<String> checkList, List<String> counterList) {
+    public K6Executor(String scriptPath, String k6BinaryPath, List<String> checkList, List<String> counterList) {
         if (scriptPath == null) {
             throw new RuntimeException("scriptPath is should not null");
         }
         this.scriptPath = scriptPath;
         this.checkList = checkList;
         this.counterList = counterList;
+        this.k6BinaryPath = k6BinaryPath;
 
         k6SetUp();
     }
