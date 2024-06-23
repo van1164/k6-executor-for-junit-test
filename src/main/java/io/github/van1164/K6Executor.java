@@ -37,7 +37,7 @@ public class K6Executor {
 
     @Builder.Default
     private List<String> counterList = List.of();
-    
+
 
     /**
      * K6 Executor Constructor
@@ -55,6 +55,12 @@ public class K6Executor {
      *                   </code>
      *                   <br> you can configure the checklist as follows.
      *                   <br> {@code List<String> checkList = {"is status 200", "response time {@literal <} 500ms"}; }
+     *
+     * @param counterList k6 counter list
+     *                    <br> ex "success_check"
+     *                    <code>
+     *                    <br> const successCheck = new Counter('success_check');
+     *                    </code>
      */
 
     public K6Executor(String scriptPath, String k6BinaryPath, List<String> checkList, List<String> counterList) {
@@ -65,6 +71,17 @@ public class K6Executor {
         this.checkList = checkList;
         this.counterList = counterList;
         this.k6BinaryPath = k6BinaryPath;
+
+        k6SetUp();
+    }
+
+    public K6Executor(String scriptPath, List<String> checkList, List<String> counterList) {
+        if (scriptPath == null) {
+            throw new RuntimeException("scriptPath is should not null");
+        }
+        this.scriptPath = scriptPath;
+        this.checkList = checkList;
+        this.counterList = counterList;
 
         k6SetUp();
     }
