@@ -38,6 +38,9 @@ public class K6Executor {
     @Builder.Default
     private List<String> counterList = List.of();
 
+    @Builder.Default
+    private HashMap<String,String> args = new HashMap<>();
+
 
     /**
      * K6 Executor Constructor
@@ -63,7 +66,7 @@ public class K6Executor {
      *                    </code>
      */
 
-    public K6Executor(String scriptPath, String k6BinaryPath, List<String> checkList, List<String> counterList) {
+    public K6Executor(String scriptPath, String k6BinaryPath, List<String> checkList, List<String> counterList, HashMap<String,String>args) {
         if (scriptPath == null) {
             throw new RuntimeException("scriptPath is should not null");
         }
@@ -71,6 +74,7 @@ public class K6Executor {
         this.checkList = checkList;
         this.counterList = counterList;
         this.k6BinaryPath = k6BinaryPath;
+        this.args = args;
 
         k6SetUp();
     }
@@ -136,7 +140,7 @@ public class K6Executor {
      */
 
     public K6Result runTest() throws IOException {
-        String[] command = {k6BinaryPath, "run", scriptPath};
+        String[] command = createCommand();
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
@@ -152,6 +156,18 @@ public class K6Executor {
         String result = outputString.toString();
 
         return resultToK6Result(result);
+    }
+
+    private String[] createCommand(){
+        List<String> commandList = new ArrayList<>(List.of(k6BinaryPath, "run", scriptPath));
+
+        if(!args.isEmpty()){
+            for(String key : args.keySet()){
+                commandList.add("--env");
+                commandList.add(key+"="+ args.get(key));
+            }
+        }
+        return commandList.toArray(new String[0]);
     }
 
     private void givePermission() {

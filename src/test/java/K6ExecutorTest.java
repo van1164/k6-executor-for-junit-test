@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,6 +109,33 @@ public class K6ExecutorTest {
             fail("Exception occurred during K6 load test: " + e.getMessage());
         }
     }
+
+    @Test
+    public void getArgsTest() {
+        List<String> checkList = List.of("is status 200", "response time < 500ms");
+        List<String> counterList = List.of("args_counterA","args_counterB");
+        HashMap<String,String> args = new HashMap<>();
+        args.put("TESTA","abc");
+        args.put("TESTB","def");
+        K6Executor executor = K6Executor.builder()
+                .scriptPath("args_test.js")
+                .checkList(checkList)
+                .counterList(counterList)
+                .args(args)
+                .build();
+        try {
+            K6Result result = executor.runTest();
+            assertTrue(result.httpRequestFound());
+            assertEquals(result.getTotalRequest(), result.getSuccessRequest()+result.getFailRequest());
+            assertNotNull(result.getCount("args_counterA"));
+            assertNotNull(result.getCount("args_counterB"));
+            assertEquals(result.getCount("args_counterA"),result.getCount("args_counterB"));
+            result.printResult();
+        } catch (Exception e) {
+            fail("Exception occurred during K6 load test: " + e.getMessage());
+        }
+    }
+
 
     private static void serverStart() throws IOException {
         server = HttpServer.create(new InetSocketAddress(8080), 0);
