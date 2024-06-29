@@ -29,7 +29,7 @@ K6Executor executor = K6Executor.builder()
 	.counterList(counterList) // counter list allows you to obtain counter added to the script.
 	.args(args)		// You can put arguments to be delivered as script.
 	.build();
-//K6Executor executor = new K6Executor("C:\\Users\\test.js",checkList);  It also supports absolute paths.
+//K6Executor executor = K6Executor.builder().scriptPath("C:\\Users\\test.js",checkList);  It also supports absolute paths.
 K6Result result = executor.runTest();
 ```
 
@@ -115,7 +115,9 @@ class K6Tests {
     void k6ExecutorTest() throws Exception {
         System.out.print(tripId);
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = new K6Executor("test.js", checkList);
+        K6Executor executor = K6Executor.builder()
+					.scriptPath("test.js")
+					.checkList(checkList);
         try {
             K6Result result = executor.runTest();
             assertTrue(result.isAllPassed());
@@ -146,7 +148,9 @@ class WebfluxSecurityExampleApplicationTests {
 	@Test
 	void contextLoads() throws Exception {
 		List<String> checkList = List.of("is status 200", "response time < 500ms");
-		K6Executor executor = new K6Executor("test.js",checkList);
+		K6Executor executor = K6Executor.builder()
+				.scriptPath("test.js")
+				.checkList(checkList);
 		try {
 			K6Result result =  executor.runTest();
 			assertTrue(result.isAllPassed());    //check all checkList passed
@@ -168,7 +172,9 @@ class WebfluxSecurityExampleApplicationTests {
 	@Test
 	fun k6ExecutorTest() {
 		val checkList = listOf("is status 200", "response time < 500ms")
-		val executor = K6Executor("test.js", checkList)
+		val executor = K6Executor.builder()
+				.scriptPath("test.js")
+				.checkList(checkList);
 		try {
 			val result = executor.runTest()
 			assertTrue(result.isAllPassed)    //check all checkList passed
