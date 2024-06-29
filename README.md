@@ -9,21 +9,25 @@
 ## Install
 gradle
 ```groovy
-implementation 'io.github.van1164:k6-executor:0.5.1'
+implementation 'io.github.van1164:k6-executor:0.6.0'
 ```
 gradle.kts
 ```kotlin
-implementation("io.github.van1164:k6-executor:0.5.1")
+implementation("io.github.van1164:k6-executor:0.6.0")
 ```
 
 ## run test
 ```java
 List<String> checkList = List.of("is status 200", "response time < 500ms");
 List<String> counterList = List.of("success_check");
+HashMap<String,String> args = new HashMap<>();
+args.put("TESTA","abc");
+args.put("TESTB","def");
 K6Executor executor = K6Executor.builder()
 	.scriptPath("test.js")  // If you specify "test.js", it is the root path of gradle
-	.checkList(checkList)
-	.counterList(counterList)
+	.checkList(checkList)	  // check list allows you to check the check specified in the script in java.
+	.counterList(counterList) // counter list allows you to obtain counter added to the script.
+	.args(args)		// You can put arguments to be delivered as script.
 	.build();
 //K6Executor executor = new K6Executor("C:\\Users\\test.js",checkList);  It also supports absolute paths.
 K6Result result = executor.runTest();
@@ -182,6 +186,9 @@ class WebfluxSecurityExampleApplicationTests {
 ```javascript
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+
+const testA = __ENV.TESTA;
+const testB = __ENV.TESTB;
 
 export let options = {
   vus: 2,
