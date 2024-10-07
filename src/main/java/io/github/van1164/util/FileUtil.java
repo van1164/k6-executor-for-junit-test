@@ -9,8 +9,6 @@ import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static io.github.van1164.util.Constant.K6_VERSION;
-
 public class FileUtil {
 
     public static void unzip(String filePath, String destDir) {

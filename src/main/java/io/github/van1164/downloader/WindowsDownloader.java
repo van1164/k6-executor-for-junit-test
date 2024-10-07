@@ -1,8 +1,7 @@
 package io.github.van1164.downloader;
 
 
-import static io.github.van1164.util.Constant.K6_VERSION;
-import static io.github.van1164.util.Constant.ZIP_FILE_NAME;
+import static io.github.van1164.util.K6Constants.ZIP_FILE_NAME;
 import static io.github.van1164.util.FileUtil.unzip;
 
 public class WindowsDownloader extends AbstractK6DownloaderByOS{

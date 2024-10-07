@@ -8,8 +8,8 @@ plugins {
 
 group = 'io.github.van1164'
 version = '0.6.0'
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '15'
+targetCompatibility = '15'
 
 repositories {
     mavenCentral()
@@ -76,6 +76,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.32'
     implementation 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 
 }
 

@@ -1,6 +1,6 @@
 package io.github.van1164.downloader;
 
-import static io.github.van1164.util.Constant.TAR_FILE_NAME;
+import static io.github.van1164.util.K6Constants.TAR_FILE_NAME;
 import static io.github.van1164.util.FileUtil.untar;
 
 public class LinuxDownloader extends AbstractK6DownloaderByOS{

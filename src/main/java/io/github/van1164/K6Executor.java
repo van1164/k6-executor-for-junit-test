@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static io.github.van1164.util.Constant.K6_BINARY_PATH;
-import static io.github.van1164.util.Constant.K6_VERSION;
+import static io.github.van1164.util.K6Constants.K6_BINARY_PATH;
+import static io.github.van1164.util.K6Constants.K6_VERSION;
 import static io.github.van1164.util.K6RegexFinder.countByResult;
 import static io.github.van1164.util.K6RegexFinder.countHttpReq;
 

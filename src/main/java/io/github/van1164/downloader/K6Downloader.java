@@ -1,7 +1,7 @@
 package io.github.van1164.downloader;
 
 
-import static io.github.van1164.util.Constant.K6_VERSION;
+import static io.github.van1164.util.K6Constants.K6_VERSION;
 
 public class K6Downloader {
 
