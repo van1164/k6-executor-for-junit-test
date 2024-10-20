@@ -3,6 +3,7 @@ package scriptBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.van1164.scirptBuilder.*;
 import io.github.van1164.util.K6Constants;
+import io.github.van1164.util.K6Imports;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,23 +23,22 @@ public class K6ScriptBuilderTest {
     @Test
     public void testBasicScriptGeneration() throws JsonProcessingException {
         // Arrange
-        HttpRequest request = new HttpRequest.Builder()
+        HttpRequest request = new HttpRequest.Builder("res")
                 .method(HttpMethod.GET)
                 .url("https://test-api.com/get")
                 .build();
 
         // Act
         String script = builder
-                .addImport("http")
+                .addImport(K6Imports.HTTP)
                 .addHttpRequest(request)
                 .build();
 
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-
                 export default function () {
-                    let res = http.get('https://test-api.com/get');
+                let res = http.get('https://test-api.com/get');
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());
@@ -47,7 +47,7 @@ public class K6ScriptBuilderTest {
     @Test
     public void testPostRequestWithBody() throws JsonProcessingException {
         // Arrange
-        HttpRequest request = new HttpRequest.Builder()
+        HttpRequest request = new HttpRequest.Builder("res")
                 .method(HttpMethod.POST)
                 .url("https://test-api.com/post")
                 .body(Map.of("key", "value"))
@@ -55,17 +55,16 @@ public class K6ScriptBuilderTest {
 
         // Act
         String script = builder
-                .addImport("http")
+                .addImport(K6Imports.HTTP)
                 .addHttpRequest(request)
                 .build();
 
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-
                 export default function () {
-                    let payload = '{"key":"value"}';
-                    let res = http.post('https://test-api.com/post');
+                let payload = '{"key":"value"}';
+                let res = http.post('https://test-api.com/post');
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());
@@ -74,14 +73,14 @@ public class K6ScriptBuilderTest {
     @Test
     public void testScriptWithVUAndDuration() throws JsonProcessingException {
         // Arrange
-        HttpRequest request = new HttpRequest.Builder()
+        HttpRequest request = new HttpRequest.Builder("res")
                 .method(HttpMethod.GET)
                 .url("https://test-api.com/get")
                 .build();
 
         // Act
         String script = builder
-                .addImport("http")
+                .addImport(K6Imports.HTTP)
                 .addVU(50)
                 .addDuration("30s")
                 .addHttpRequest(request)
@@ -90,14 +89,12 @@ public class K6ScriptBuilderTest {
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-
                 export let options = {
-                    'vus': 50,
-                    'duration': '30s',
+                'vus': 50,
+                'duration': '30s',
                 };
-
                 export default function () {
-                    let res = http.get('https://test-api.com/get');
+                let res = http.get('https://test-api.com/get');
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());
@@ -106,7 +103,7 @@ public class K6ScriptBuilderTest {
     @Test
     public void testScriptWithCheck() throws JsonProcessingException {
         // Arrange
-        HttpRequest request = new HttpRequest.Builder()
+        HttpRequest request = new HttpRequest.Builder("res")
                 .method(HttpMethod.GET)
                 .url("https://test-api.com/get")
                 .build();
@@ -115,8 +112,8 @@ public class K6ScriptBuilderTest {
 
         // Act
         String script = builder
-                .addImport("http")
-                .addImport("check")
+                .addImport(K6Imports.HTTP)
+                .addImport(K6Imports.Check)
                 .addHttpRequest(request)
                 .addCheck(check)
                 .build();
@@ -124,11 +121,10 @@ public class K6ScriptBuilderTest {
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-                import check from 'k6/check';
-
+                import { check } from 'k6';
                 export default function () {
-                    let res = http.get('https://test-api.com/get');
-                    check(res, { 'status is 200': r => r.status === 200 });
+                let res = http.get('https://test-api.com/get');
+                check(res, { 'status is 200': r => r.status === 200 });
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());
@@ -137,7 +133,7 @@ public class K6ScriptBuilderTest {
     @Test
     public void testScriptWithThresholds() throws JsonProcessingException {
         // Arrange
-        HttpRequest request = new HttpRequest.Builder()
+        HttpRequest request = new HttpRequest.Builder("res")
                 .method(HttpMethod.GET)
                 .url("https://test-api.com/get")
                 .build();
@@ -146,7 +142,7 @@ public class K6ScriptBuilderTest {
 
         // Act
         String script = builder
-                .addImport("http")
+                .addImport(K6Imports.HTTP)
                 .addHttpRequest(request)
                 .addThreshold(threshold)
                 .build();
@@ -154,13 +150,11 @@ public class K6ScriptBuilderTest {
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-
                 export let thresholds = {
-                    'http_req_duration': ['p(95) < 500'],
+                'http_req_duration': ['p(95) < 500'],
                 };
-
                 export default function () {
-                    let res = http.get('https://test-api.com/get');
+                let res = http.get('https://test-api.com/get');
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());
@@ -169,12 +163,12 @@ public class K6ScriptBuilderTest {
     @Test
     public void testFullComplexScript() throws JsonProcessingException {
         // Arrange
-        HttpRequest getRequest = new HttpRequest.Builder()
+        HttpRequest getRequest = new HttpRequest.Builder("res1")
                 .method(HttpMethod.GET)
                 .url("https://test-api.com/get")
                 .build();
 
-        HttpRequest postRequest = new HttpRequest.Builder()
+        HttpRequest postRequest = new HttpRequest.Builder("res2")
                 .method(HttpMethod.POST)
                 .url("https://test-api.com/post")
                 .body(Map.of("key", "value"))
@@ -185,8 +179,8 @@ public class K6ScriptBuilderTest {
 
         // Act
         String script = builder
-                .addImport("http")
-                .addImport("check")
+                .addImport(K6Imports.HTTP)
+                .addImport(K6Imports.Check)
                 .addVU(100)
                 .addDuration("1m")
                 .addHttpRequest(getRequest)
@@ -198,22 +192,19 @@ public class K6ScriptBuilderTest {
         // Assert
         String expectedScript = """
                 import http from 'k6/http';
-                import check from 'k6/check';
-
+                import { check } from 'k6';
                 export let options = {
-                    'vus': 100,
-                    'duration': '1m',
+                'vus': 100,
+                'duration': '1m',
                 };
-
                 export let thresholds = {
-                    'http_req_duration': ['p(95) < 500'],
+                'http_req_duration': ['p(95) < 500'],
                 };
-
                 export default function () {
-                    let res = http.get('https://test-api.com/get');
-                    let payload = '{"key":"value"}';
-                    res = http.post('https://test-api.com/post');
-                    check(res, { 'status is 200': r => r.status === 200 });
+                let res1 = http.get('https://test-api.com/get');
+                let payload = '{"key":"value"}';
+                let res2 = http.post('https://test-api.com/post');
+                check(res, { 'status is 200': r => r.status === 200 });
                 }
                 """;
         assertEquals(expectedScript.trim(), script.trim());

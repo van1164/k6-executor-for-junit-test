@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class HttpRequest {
     @Getter
+    private String variableName;
+    @Getter
     private HttpMethod method;
     @Getter
     private String url;
@@ -20,6 +22,7 @@ public class HttpRequest {
         this.url = builder.url;
         this.headers = builder.headers;
         this.body = builder.body;
+        this.variableName = builder.variableName;
     }
 
     public String getBodyAsJson() throws JsonProcessingException {
@@ -31,10 +34,15 @@ public class HttpRequest {
     }
 
     public static class Builder {
+        private String variableName;
         private HttpMethod method;
         private String url;
         private Map<String, String> headers;
         private Map<String, String> body;
+
+        public Builder(String variableName){
+            this.variableName = variableName;
+        }
 
         public Builder method(HttpMethod method) {
             this.method = method;

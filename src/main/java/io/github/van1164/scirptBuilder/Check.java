@@ -1,5 +1,8 @@
 package io.github.van1164.scirptBuilder;
 
+import lombok.Getter;
+
+@Getter
 public class Check {
     private String variable;
     private String description;
