@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'io.github.van1164'
-version = '0.6.0'
+version = '0.7.0'
 sourceCompatibility = '15'
 targetCompatibility = '15'
 
@@ -35,7 +35,7 @@ mavenPublishing {
 //    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
 
 
-    coordinates("io.github.van1164", "k6-executor", "0.6.0")
+    coordinates("io.github.van1164", "k6-executor", "0.7.0")
 
     pom {
         name = "k6-executor"
