@@ -17,20 +17,49 @@ implementation("io.github.van1164:k6-executor:0.7.0")
 ```
 
 ## run test
+
+### with js script file
 ```java
 List<String> checkList = List.of("is status 200", "response time < 500ms");
 List<String> counterList = List.of("success_check");
 HashMap<String,String> args = new HashMap<>();
 args.put("TESTA","abc");
 args.put("TESTB","def");
-K6Executor executor = K6Executor.builder()
+K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder()
 	.scriptPath("test.js")  // If you specify "test.js", it is the root path of gradle
 	.checkList(checkList)	  // check list allows you to check the check specified in the script in java.
 	.counterList(counterList) // counter list allows you to obtain counter added to the script.
 	.args(args)		// You can put arguments to be delivered as script.
 	.build();
-//K6Executor executor = K6Executor.builder().scriptPath("C:\\Users\\test.js",checkList);  It also supports absolute paths.
+
+// It also supports absolute paths.
+//K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("C:\\Users\\test.js",checkList);
+
+
 K6Result result = executor.runTest();
+```
+
+### with k6ScriptBuilder
+```java
+HttpRequest request = new HttpRequest.Builder("res")
+	.method(HttpMethod.GET)
+	.url("http://localhost:8080")
+	.build();
+
+Check statusCheck = Check.statusCheck("res", 200);
+Check responseTimeCheck = new Check("res", "response time < 500ms","(r) => r.timings.duration < 50000");
+
+K6ScriptBuilder script = new K6ScriptBuilder()
+	.addImport("import http from 'k6/http'")
+	.addImport(K6Imports.Check)
+	.addHttpRequest(request)
+	.addCheck(statusCheck)
+	.addCheck(responseTimeCheck);
+
+K6ExecutorWithScriptBuilder executor = K6ExecutorWithScriptBuilder.builder().sb(script).build();
+
+K6Result result = executor.runTest();
+
 ```
 
 ## printResult
@@ -115,7 +144,7 @@ class K6Tests {
     void k6ExecutorTest() throws Exception {
         System.out.print(tripId);
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6Executor executor = K6Executor.builder()
+        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder()
 					.scriptPath("test.js")
 					.checkList(checkList);
         try {
@@ -148,7 +177,7 @@ class WebfluxSecurityExampleApplicationTests {
 	@Test
 	void contextLoads() throws Exception {
 		List<String> checkList = List.of("is status 200", "response time < 500ms");
-		K6Executor executor = K6Executor.builder()
+		K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder()
 				.scriptPath("test.js")
 				.checkList(checkList);
 		try {
@@ -172,7 +201,7 @@ class WebfluxSecurityExampleApplicationTests {
 	@Test
 	fun k6ExecutorTest() {
 		val checkList = listOf("is status 200", "response time < 500ms")
-		val executor = K6Executor.builder()
+		val executor = K6ExecutorWithScriptPath.builder()
 				.scriptPath("test.js")
 				.checkList(checkList);
 		try {
