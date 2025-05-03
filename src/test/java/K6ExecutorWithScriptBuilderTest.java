@@ -1,6 +1,5 @@
 import com.sun.net.httpserver.HttpServer;
-import io.github.van1164.executor.K6ExecutorWithScriptBuilder;
-import io.github.van1164.executor.K6ExecutorWithScriptPath;
+import io.github.van1164.executor.K6Executor;
 import io.github.van1164.result.K6Result;
 import io.github.van1164.scirptBuilder.Check;
 import io.github.van1164.scirptBuilder.HttpMethod;
@@ -13,8 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,7 +49,7 @@ public class K6ExecutorWithScriptBuilderTest {
                 .addCheck(statusCheck)
                 .addCheck(responseTimeCheck);
 
-        K6ExecutorWithScriptBuilder executor = K6ExecutorWithScriptBuilder.builder().sb(script).build();
+        K6Executor executor = K6Executor.withScript(script).build();
 
         System.out.println(script.build());
 

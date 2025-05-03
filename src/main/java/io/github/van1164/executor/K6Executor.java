@@ -3,7 +3,11 @@ package io.github.van1164.executor;
 import io.github.van1164.downloader.K6Downloader;
 import io.github.van1164.result.HttpReq;
 import io.github.van1164.result.K6Result;
+import io.github.van1164.scirptBuilder.K6ScriptBuilder;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.BufferedReader;
@@ -16,36 +20,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.van1164.util.K6Constants.K6_BINARY_PATH;
 import static io.github.van1164.util.K6Constants.K6_VERSION;
 import static io.github.van1164.util.K6RegexFinder.countByResult;
 import static io.github.van1164.util.K6RegexFinder.countHttpReq;
 
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
-abstract class K6Executor {
+public abstract class K6Executor {
     @Builder.Default
     protected String k6BinaryPath = K6_BINARY_PATH;
-
-//
-//    K6Executor() {
-//        this.k6BinaryPath  = K6_BINARY_PATH;
-//        System.out.println(k6BinaryPath);
-//
-//    }
-//    K6Executor(String k6BinaryPath) {
-//        if (k6BinaryPath == null) {
-//            this.k6BinaryPath  = K6_BINARY_PATH;
-//        }
-//        else{
-//            this.k6BinaryPath = k6BinaryPath;
-//            System.out.println(k6BinaryPath);
-//        }
-//    }
 
     protected void k6SetUp() {
         String os = System.getProperty("os.name").toLowerCase();
@@ -110,30 +97,36 @@ abstract class K6Executor {
     }
 
 
-    public K6Result runTest() throws IOException {
-        k6SetUp();
-        String[] command = createCommand();
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder outputString = new StringBuilder();
-        String line;
+    /* ───────────────────── template method ───────────────────── */
+    public final K6Result runTest() throws IOException {
+        k6SetUp();                                            // 1. ensure binary
+        Process process = new ProcessBuilder(createCommand()) // 2. start process
+                .redirectErrorStream(true)
+                .start();
+        afterProcessStart(process);                           // 3. optional stdin
 
-        while ((line = reader.readLine()) != null) {
-            outputString.append(line).append("\n");
+        StringBuilder out = new StringBuilder();              // 4. capture output
+        try (BufferedReader br =
+                     new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) out.append(line).append('\n');
         }
-        reader.close();
-
-        String result = outputString.toString();
-
-        return resultToK6Result(result);
+        return resultToK6Result(out.toString());              // 5. parse result
     }
-    // Declare resultToK6Result as an abstract method
-    protected abstract K6Result resultToK6Result(String result);
-
-
+    /* ───────────── hooks for subclasses ───────────── */
     protected abstract String[] createCommand();
+    protected abstract K6Result resultToK6Result(String raw);
+    protected void afterProcessStart(Process p) throws IOException {/* default NOP */}
 
 
+    public static ScriptPathExecutor.ScriptPathExecutorBuilder<?, ?>
+    withScriptPath(String scriptPath) {
+        return ScriptPathExecutor.builder().scriptPath(scriptPath);
+    }
+
+    /* builder‑based script */
+    public static ScriptBuilderExecutor.ScriptBuilderExecutorBuilder<?, ?>
+    withScript(K6ScriptBuilder sb) {
+        return ScriptBuilderExecutor.builder().sb(sb);
+    }
 }

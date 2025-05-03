@@ -1,5 +1,5 @@
 import com.sun.net.httpserver.HttpServer;
-import io.github.van1164.executor.K6ExecutorWithScriptPath;
+import io.github.van1164.executor.K6Executor;
 import io.github.van1164.result.K6Result;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class K6ExecutorWithScriptPathTest {
     static HttpServer server;
 
-    public K6ExecutorWithScriptPathTest() throws IOException {
+    public K6ExecutorWithScriptPathTest() {
     }
 
     @BeforeAll
@@ -31,7 +31,7 @@ public class K6ExecutorWithScriptPathTest {
     @Test
     public void isAllPassedTest() throws IOException {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("test.js").checkList(checkList).build();
+        K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
 
         K6Result result = executor.runTest();
         assertTrue(result.isAllPassed(), "K6 load test failed");
@@ -41,7 +41,7 @@ public class K6ExecutorWithScriptPathTest {
     @Test
     public void isAllPassedListTest() throws IOException {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("test.js").checkList(checkList).build();
+        K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
         K6Result result = executor.runTest();
         assertTrue(result.isAllPassed(), "K6 load test failed");
 
@@ -50,7 +50,7 @@ public class K6ExecutorWithScriptPathTest {
     @Test
     public void printResultTest() throws IOException {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("test.js").checkList(checkList).build();
+        K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
 
         K6Result result = executor.runTest();
         result.printResult();
@@ -61,7 +61,7 @@ public class K6ExecutorWithScriptPathTest {
     public void getFailedCheckListTest() throws Exception {
         server.stop(0);
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("test.js").checkList(checkList).build();
+        K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
         K6Result result = executor.runTest();
         assertEquals(result.getFailedCheckList(), List.of("is status 200"));
 
@@ -71,7 +71,7 @@ public class K6ExecutorWithScriptPathTest {
     @Test
     public void getRequestCountTest() throws IOException {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder().scriptPath("test.js").checkList(checkList).build();
+        K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
 
         K6Result result = executor.runTest();
         assertTrue(result.httpRequestFound());
@@ -83,8 +83,7 @@ public class K6ExecutorWithScriptPathTest {
     public void getCounterTest() throws IOException {
         List<String> checkList = List.of("is status 200", "response time < 500ms");
         List<String> counterList = List.of("success_check");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder()
-                .scriptPath("counter_test.js")
+        K6Executor executor = K6Executor.withScriptPath("counter_test.js")
                 .checkList(checkList)
                 .counterList(counterList)
                 .build();
@@ -104,8 +103,7 @@ public class K6ExecutorWithScriptPathTest {
         HashMap<String, String> args = new HashMap<>();
         args.put("TESTA", "abc");
         args.put("TESTB", "def");
-        K6ExecutorWithScriptPath executor = K6ExecutorWithScriptPath.builder()
-                .scriptPath("args_test.js")
+        K6Executor executor = K6Executor.withScriptPath("args_test.js")
                 .checkList(checkList)
                 .counterList(counterList)
                 .args(args)
