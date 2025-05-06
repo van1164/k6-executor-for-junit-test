@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'io.github.van1164:k6-executor:0.7.0'
+    testImplementation 'io.github.van1164:k6-executor:0.8.0'
 }
 ```
 
@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.github.van1164:k6-executor:0.7.0")
+    testImplementation("io.github.van1164:k6-executor:0.8.0")
 }
 ```
 
