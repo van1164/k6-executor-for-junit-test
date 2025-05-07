@@ -15,7 +15,7 @@ public class FileUtil {
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(filePath))) {
             ZipEntry entry;
             while ((entry = zipIn.getNextEntry()) != null) {
-                File outputFile = new File(destDir, entry.getName());
+                File outputFile = new File(destDir, "."+entry.getName());
                 if (entry.isDirectory()) {
                     if (!outputFile.exists()) {
                         outputFile.mkdirs();
@@ -43,7 +43,7 @@ public class FileUtil {
                 new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(filePath))))) {
             TarArchiveEntry entry;
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-                File outputFile = new File(destDir, entry.getName());
+                File outputFile = new File(destDir, "."+entry.getName());
                 if (entry.isDirectory()) {
                     if (!outputFile.exists()) {
                         outputFile.mkdirs();

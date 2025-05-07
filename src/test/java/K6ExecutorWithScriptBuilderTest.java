@@ -56,7 +56,6 @@ public class K6ExecutorWithScriptBuilderTest {
         K6Result result = executor.runTest();
         result.printResult();
         assertTrue(result.isAllPassed(), "K6 load test failed");
-
     }
 
 

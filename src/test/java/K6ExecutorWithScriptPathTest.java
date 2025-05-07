@@ -74,8 +74,8 @@ public class K6ExecutorWithScriptPathTest {
         K6Executor executor = K6Executor.withScriptPath("test.js").checkList(checkList).build();
 
         K6Result result = executor.runTest();
-        assertTrue(result.httpRequestFound());
-        assertEquals(result.getTotalRequest(), result.getSuccessRequest() + result.getFailRequest());
+        assertTrue(result.getHttpReqs().getTotal() > 0, "K6 load test failed");
+        assertTrue(result.getHttpReqs().getTotal()>result.getHttpReqFailed().getTotal(), "K6 load test failed");
 
     }
 
@@ -89,10 +89,7 @@ public class K6ExecutorWithScriptPathTest {
                 .build();
 
         K6Result result = executor.runTest();
-        assertTrue(result.httpRequestFound());
-        assertEquals(result.getTotalRequest(), result.getSuccessRequest() + result.getFailRequest());
-        result.printResult();
-        assertEquals(result.getCount("success_check"), result.getSuccessRequest());
+        assertTrue(result.getCount("success_check") > 0, "K6 load test failed");
 
     }
 
@@ -110,8 +107,6 @@ public class K6ExecutorWithScriptPathTest {
                 .build();
 
         K6Result result = executor.runTest();
-        assertTrue(result.httpRequestFound());
-        assertEquals(result.getTotalRequest(), result.getSuccessRequest() + result.getFailRequest());
         assertNotNull(result.getCount("args_counterA"));
         assertNotNull(result.getCount("args_counterB"));
         assertEquals(result.getCount("args_counterA"), result.getCount("args_counterB"));

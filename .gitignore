@@ -40,4 +40,6 @@ k6_download
 
 secring.gpg
 
-k6-v0.51.0-macos-amd64/k6
+.k6-v0.51.0-macos-amd64/k6
+
+.k6-v1.0.0-macos-amd64/k6

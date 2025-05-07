@@ -1,4 +1,6 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import com.vanniktech.maven.publish.JavaLibrary   // ★ 추가
+import com.vanniktech.maven.publish.JavadocJar    // ★ 추가
 
 plugins {
     id 'java'
@@ -7,7 +9,7 @@ plugins {
 }
 
 group = 'io.github.van1164'
-version = '0.7.0'
+version = '0.8.0'
 sourceCompatibility = '15'
 targetCompatibility = '15'
 
@@ -33,14 +35,15 @@ mavenPublishing {
 //    configure(new JavaLibrary(new JavadocJar.Empty(), true))
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 //    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
+    configure(new JavaLibrary(new JavadocJar.Empty(), true))
 
 
-    coordinates("io.github.van1164", "k6-executor", "0.7.0")
+    coordinates("io.github.van1164", "k6-executor", "0.9.0")
 
     pom {
         name = "k6-executor"
         description = "k6-executor for junit"
-        inceptionYear = "2024"
+        inceptionYear = "2025"
         url = "https://github.com/van1164/k6-executor-for-junit-test"
 
 
@@ -65,7 +68,6 @@ mavenPublishing {
         }
     }
 }
-
 
 
 
