@@ -9,20 +9,17 @@
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-* **Zero local dependencies** – works on CI/CD containers too
-* **Two DSLs**
-    * **Script Mode** – point to an existing `*.js` k6 script
-    * **Builder Mode** – build a script in plain Java using `K6ScriptBuilder`
-* **Rich result object** (`K6Result`)
-    * total / success / fail requests
-    * custom checks & counters
-    * full raw output for debugging
-* **JUnit‑friendly** – designed for `assert*()` in unit/integration tests
-* **Automatic binary caching** – download once, reuse later
-
+| Category | Details |
+|----------|---------|
+| **No local deps** | Works on CI/CD runners without k6 pre‑install |
+| **Two DSLs** | *Script Mode* – point to an existing `*.js` <br>*Builder Mode* – build inline with `K6ScriptBuilder` |
+| **Rich `K6Result`** | *NEW* for k6 ≥ 1.0 – structured objects:<br>  `DurationStats`, `CounterStats`, `DataStats` (avg/min/p95, bytes/s …) |
+| **TOTAL RESULTS support** | Parses `█ TOTAL RESULTS` block (total / succeeded / failed) |
+| **Metric helpers** | `result.getHttpReqDuration().getAvg()` etc. – no regex needed |
 ---
+
 
 ## 🚀 Installation
 
@@ -35,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'io.github.van1164:k6-executor:0.8.0'
+    testImplementation 'io.github.van1164:k6-executor:0.9.0'
 }
 ```
 
@@ -47,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.github.van1164:k6-executor:0.8.0")
+    testImplementation("io.github.van1164:k6-executor:0.9.0")
 }
 ```
 
@@ -58,70 +55,28 @@ dependencies {
 ### 1) Run an existing k6 script file
 
 ```java
-List<String> checks   = List.of("is status 200", "response time < 500ms");
-List<String> counters = List.of("success_check");
-
-Map<String,String> env = Map.of(
-        "BASE_URL", "https://api.dev"
-);
-
 K6Result result = K6Executor
-        .withScriptPath("perf/login.js")   // relative to project root
-        .checkList(checks)
-        .counterList(counters)
-        .args(env)                         //   -> becomes __ENV.BASE_URL
+        .withScriptPath("perf/login.js")        // points to a file
+        .checkList(List.of("is status 200"))     // assert these ✓ checks
+        .args(Map.of("BASE_URL", "https://api.dev"))
         .build()
         .runTest();
 
 assertTrue(result.isAllPassed());
+System.out.println("p95 latency = " + result.getHttpReqDuration().getP95() + " ms");
 ```
 
-### 2) Build a script in Java (no `*.js` file needed)
+### 2 – Build the script in Java
 
 ```java
-HttpRequest req = new HttpRequest.Builder("res")
-        .method(HttpMethod.GET)
-        .url("http://localhost:8080/health")
-        .build();
-
-K6ScriptBuilder script = K6ScriptBuilder.builder()
+K6ScriptBuilder sb = K6ScriptBuilder.builder()
         .addImport("import http from 'k6/http'")
-        .addImport(K6Imports.Check)
-        .addHttpRequest(req)
-        .addCheck(Check.statusCheck("res", 200))
+        .raw("export const options = { vus: 20, duration: '30s' };")
+        .raw("export default function () { http.get('https://example.com'); }")
         .build();
 
-K6Result result = K6Executor
-        .withScript(script)   // runs via STDIN
-        .build()
-        .runTest();
-
-System.out.println("99th‑perc duration: " + result.percentile("http_req_duration", 0.99));
-```
-
----
-
-## 🧪 JUnit Example – Consistency Check
-
-```java
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LikeConcurrencyTests {
-
-    @Test
-    void likeLoadTest() throws Exception {
-        List<String> checks = List.of("is status 200", "response time < 500ms");
-
-        K6Result result = K6Executor
-                .withScriptPath("like_test.js")
-                .checkList(checks)
-                .build()
-                .runTest();
-
-        assertTrue(result.isAllPassed());
-        Trip trip = tripRepository.findById(tripId).orElseThrow();
-        assertEquals(result.getSuccessRequest(), trip.getLikeCount());
-    }
-}
+K6Result r = K6Executor.withScript(sb).build().runTest();
+System.out.println("total reqs = " + r.getHttpReqs().getTotal());
 ```
 
 ---
@@ -149,14 +104,64 @@ export default function () {
 
 ---
 
-## 📊 Accessing Results
+## 🧪 JUnit Example – end‑to‑end SSE test (k6 xk6‑sse)
 
 ```java
-result.printResult();           // pretty‑prints the full k6 output
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class ChatSseLoadTest {
 
-int total   = result.getTotalRequest();
-int success = result.getSuccessRequest();
-int fail    = result.getFailRequest();
+  @LocalServerPort int port;
 
-Map<String,Integer> counters = result.getCounterMap();
+  @Test void roundTrip() throws Exception {
+    Map<String,String> env = Map.of(
+        "BASE_URL", "http://localhost:" + port,
+        "ROOM_ID",  "test-room",
+        "VUS",      "50",
+        "DURATION", "1m");
+
+    K6Result res = K6Executor
+        .withScriptPath("src/test/k6/sse_chat_roundtrip.js")
+        .k6BinaryPath("./k6")          // ← custom xk6 build containing sse
+        .args(env)
+        .counterList(List.of("messages_sent", "messages_received"))
+        .checkList(List.of("SSE status 200"))
+        .build().runTest();
+
+    assertEquals(0, res.getHttpReqFailed().getTotal());
+    assertEquals(50, res.getCounterMap().get("messages_received"));
+  }
+}
 ```
+
+---
+
+## 📊 Digging into Results
+
+```java
+DurationStats d = result.getHttpReqDuration();
+System.out.printf("avg=%.2f ms, p95=%.2f ms%n", d.getAvg(), d.getP95());
+
+long bytes = result.getDataReceived().getBytes();
+System.out.println("network in = " + bytes + " B");
+```
+
+Available getters _(v1.0 branch)_:
+
+| Method | Returns |
+|--------|---------|
+| `getHttpReqDuration()` | `DurationStats` (ms) |
+| `getHttpReqs()` | `CounterStats` |
+| `getHttpReqFailed()` | `CounterStats` |
+| `getIterationDuration()` | `DurationStats` |
+| `getIterations()` | `CounterStats` |
+| `getDataReceived()` | `DataStats` |
+| `getDataSent()` | `DataStats` |
+| `getChecksTotal()` / `getChecksSucceeded()` / `getChecksFailed()` | ints |
+
+Raw metric line access:
+
+```java
+String rawLine = result.getMetrics().get("http_req_duration");
+```
+
+---
